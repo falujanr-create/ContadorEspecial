@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Nuestro tiempo</title>
+<meta name="theme-color" content="#1c1c24">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<style>
+  /* ========= COLORES: edita aquí ========= */
+  :root {
+    --fondo: #1c1c24;       /* negro suave */
+    --texto: #ff8fb1;       /* rosa */
+    --secundario: #c9a9b6;  /* texto pequeño */
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    background: var(--fondo);
+    color: var(--texto);
+    font-family: "Segoe UI", system-ui, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 24px;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  #titulo { color: var(--secundario); font-size: 1.1rem; margin-bottom: 8px; }
+  #dias   { font-size: clamp(3rem, 18vw, 5.5rem); font-weight: 300; line-height: 1.1; }
+  #hms    { font-size: clamp(1.2rem, 6vw, 1.8rem); margin-top: 10px; letter-spacing: 1px; }
+  .corazon { margin-top: 28px; font-size: 1.6rem; animation: latido 1.6s ease-in-out infinite; }
+  @keyframes latido { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.18); } }
+</style>
+</head>
+<body>
+  <div id="titulo"></div>
+  <div id="dias">--</div>
+  <div id="hms">-- h &nbsp; -- min &nbsp; -- s</div>
+  <div class="corazon">❤</div>
+
+<script>
+  // ========= CONFIGURACIÓN: edita solo esto =========
+  const FECHA_INICIO = "2026-09-01T18:30:00";   // formato: AAAA-MM-DDTHH:MM:SS
+  const TEXTO_SUPERIOR = "Conociendonos desde hace";
+  // ==================================================
+
+  const inicio = new Date(FECHA_INICIO);        // se interpreta en la hora local del celular
+  document.getElementById("titulo").textContent = TEXTO_SUPERIOR;
+
+  const pad = n => String(n).padStart(2, "0");
+
+  function actualizar() {
+    let total = Math.max(0, Math.floor((Date.now() - inicio.getTime()) / 1000));
+
+    const dias = Math.floor(total / 86400);  total %= 86400;   // 86400 s = 1 día
+    const horas = Math.floor(total / 3600);  total %= 3600;    // 3600 s = 1 hora
+    const minutos = Math.floor(total / 60);
+    const segundos = total % 60;
+
+    document.getElementById("dias").textContent = dias + (dias === 1 ? " día" : " días");
+    document.getElementById("hms").innerHTML =
+      pad(horas) + " h &nbsp; " + pad(minutos) + " min &nbsp; " + pad(segundos) + " s";
+  }
+
+  actualizar();
+  setInterval(actualizar, 1000);
+
+  // Permite que funcione sin internet una vez instalada
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("sw.js").catch(() => {});
+  }
+</script>
+</body>
+</html>
